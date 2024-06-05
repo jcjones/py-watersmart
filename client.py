@@ -1,11 +1,12 @@
+"""Download Watersmart meter data"""
+
 import asyncio
 import argparse
 import logging
 from watersmart import WatersmartClient
-from datetime import datetime
 
 
-PARSER = argparse.ArgumentParser(description="""Download Water meter data""")
+PARSER = argparse.ArgumentParser(description=__doc__)
 
 PARSER.add_argument(
     "--log-level",
@@ -17,8 +18,6 @@ PARSER.add_argument("--url", required=True)
 PARSER.add_argument("--email", required=True)
 PARSER.add_argument("--password", required=True)
 
-LOCAL_TZ = datetime.now().astimezone().tzinfo
-
 
 async def main():
     args = PARSER.parse_args()
@@ -26,21 +25,14 @@ async def main():
     logging.basicConfig(level=args.log_level, format=log_format)
     wc = WatersmartClient(args.url, args.email, args.password)
     data = await wc.usage()
-    # data = [
-    #     {
-    #             "read_datetime": 1717488000,
-    #             "gallons": 67.2,
-    #             "flags": None,
-    #             "leak_gallons": 0,
-    #     }
-    # ]
     for datapoint in sorted(data, key=lambda x: x["read_datetime"]):
-        # The read datetime is a timestamp in local TZ, not UTC
-        ts = (
-            datetime.fromtimestamp(datapoint["read_datetime"], tz=None)
-            - LOCAL_TZ.utcoffset(None)
-        ).replace(tzinfo=LOCAL_TZ)
-        print(f"{ts.astimezone()} {datapoint}")
+        parts = [
+            f"{datapoint['local_datetime'].astimezone()}",
+            f"usage: {datapoint['gallons']:8}gal",
+            f"leak: {datapoint['leak_gallons']:8}gal",
+            f"flags: {datapoint['flags']}",
+        ]
+        print(" | ".join(parts))
 
 
 asyncio.run(main())

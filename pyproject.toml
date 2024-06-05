@@ -3,8 +3,8 @@ name = "py-watersmart"
 maintainers = [
   {name = "J.C. Jones", email = "jc@insufficient.coffee"},
 ]
-version = "0.4.1"
-description = "Manage DB partitions based on sequential IDs"
+version = "0.0.1"
+description = "Obtain water usage data from Watersmart.com"
 classifiers = [
   "Development Status :: 4 - Beta",
   "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
@@ -14,7 +14,14 @@ keywords = ["water meter"]
 dependencies = [
   "aiohttp"
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-asyncio",
+]
 
 [tool.ruff]
 line-length = 88  # default is 88
@@ -26,3 +33,5 @@ ignore = [
   "S101",   # Allow assert statements
 ]
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
