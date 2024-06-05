@@ -1,0 +1,28 @@
+[project]
+name = "py-watersmart"
+maintainers = [
+  {name = "J.C. Jones", email = "jc@insufficient.coffee"},
+]
+version = "0.4.1"
+description = "Manage DB partitions based on sequential IDs"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+  "Programming Language :: Python :: 3",
+]
+keywords = ["water meter"]
+dependencies = [
+  "aiohttp"
+]
+requires-python = ">=3.8"
+
+[tool.ruff]
+line-length = 88  # default is 88
+target-version = "py38"
+
+[tool.ruff.lint]
+ignore = [
+  "ISC001", # Implicit string concatenation can conflict with ruff format
+  "S101",   # Allow assert statements
+]
+
