@@ -1,6 +1,8 @@
 """Main WaterSmart module"""
 
-import aiohttp
+import logging
+
+from aiohttp_client_cache import CachedSession, SQLiteBackend
 from datetime import datetime
 from importlib.metadata import version
 
@@ -12,11 +14,19 @@ class WatersmartClient:
         self._url = url
         self._email = email
         self._password = password
-        self._session = aiohttp.ClientSession(
-            headers={"User-Agent": "py-watersmart " + version("py-watersmart")}
+        self._headers = {"User-Agent": "py-watersmart " + version("py-watersmart")}
+        self._cache = SQLiteBackend(
+            expire_after=60 * 60 * 6,
+            include_headers=False,
+            cache_name="~/.cache/py-watersmart.db",
+        )
+        self._session = CachedSession(
+            cache=self._cache,
+            headers=self._headers,
         )
         self._data_series = []
         assert "watersmart.com" in url, "Exepcted a watersmart.com URL"
+        logging.debug("WatersmartClient ready, headers: %s", self._headers)
 
     async def _login(self):
         url = f"https://{self._url}/index.php/welcome/login?forceEmail=1"
@@ -43,6 +53,7 @@ class WatersmartClient:
 
     async def usage(self):
         if not self._data_series:
+            logging.debug("Loading watersmart data")
             await self._login()
             await self._populate_data()
             await self._close()

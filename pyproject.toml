@@ -3,7 +3,7 @@ name = "py-watersmart"
 maintainers = [
   {name = "J.C. Jones", email = "jc@insufficient.coffee"},
 ]
-version = "0.0.1"
+version = "0.1.1"
 description = "Obtain water usage data from Watersmart.com"
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -12,7 +12,8 @@ classifiers = [
 ]
 keywords = ["water meter"]
 dependencies = [
-  "aiohttp"
+  "aiohttp",
+  "aiohttp-client-cache[sqlite]"
 ]
 requires-python = ">=3.11"
 
