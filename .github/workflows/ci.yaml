@@ -1,0 +1,59 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+
+    - name: Install Linting Tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install --user pylint==3.1.0 pytest ruff validate-pyproject[all]
+
+    - name: Install
+      run: |
+        pip install --editable "."
+
+    - name: Analysing the code with pylint
+      run: |
+        python -m pylint --errors-only watersmart
+
+    - name: Lint Python code with Ruff
+      run: |
+        python -m ruff check --output-format=github
+
+    - name: Checking format with Ruff
+      run: |
+        python -m ruff format --check .
+
+    - name: Checking pyproject
+      run: |
+        validate-pyproject pyproject.toml
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+    - name: Install
+      run: |
+        pip install --editable ".[test]"
+    - name: Install PyTest
+      run: |
+        pip install pytest
+    - name: Run PyTest
+      run: |
+        python -m pytest --junitxml=test-results/junit.xml

@@ -17,6 +17,10 @@ dependencies = [
 ]
 requires-python = ">=3.11"
 
+[project.urls]
+Repository = "https://github.com/jcjones/py-watersmart.git"
+Issues = "https://github.com/jcjones/py-watersmart/issues"
+
 [project.optional-dependencies]
 test = [
     "pytest",

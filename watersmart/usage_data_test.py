@@ -21,7 +21,7 @@ def test_amend_with_local_ts():
     assert result["flags"] == datapoint["flags"]
     assert "local_datetime" not in datapoint
     assert "local_datetime" in result
-    assert f"{result["local_datetime"]}" == "2024-06-04 01:00:00+00:00"
+    assert f"{result['local_datetime']}" == "2024-06-04 01:00:00+00:00"
 
 
 @pytest.mark.asyncio
