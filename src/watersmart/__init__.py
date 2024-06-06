@@ -1,10 +1,26 @@
 """Main WaterSmart module"""
 
+import aiohttp
+import asyncio
+import async_timeout
 import logging
+import socket
 import time
 
 from aiohttp_client_cache import CachedSession, SQLiteBackend
 from importlib.metadata import version
+
+
+class WatersmartClientError(Exception):
+    """Exception to indicate a general API error."""
+
+
+class WatersmartClientCommunicationError(WatersmartClientError):
+    """Exception to indicate a communication error."""
+
+
+class WatersmartClientAuthenticationError(WatersmartClientError):
+    """Exception to indicate an authentication error."""
 
 
 class WatersmartClient:
@@ -30,11 +46,14 @@ class WatersmartClient:
     async def _login(self):
         url = f"{self._url}/index.php/welcome/login?forceEmail=1"
         login = {"token": "", "email": self._email, "password": self._password}
-        await self._session.post(url, data=login)
+        result = await self._session.post(url, data=login)
+        logging.debug(result)
 
     async def _populate_data(self):
         url = f"{self._url}/index.php/rest/v1/Chart/RealTimeChart"
         chart_rsp = await self._session.get(url)
+        if chart_rsp.status != 200:
+            raise WatersmartClientAuthenticationError()
         data = await chart_rsp.json()
         self._data_series = data["data"]["series"]
 
@@ -49,16 +68,31 @@ class WatersmartClient:
 
     async def usage(self):
         if not self._data_series:
-            logging.debug("Loading watersmart data")
-            await self._login()
-            await self._populate_data()
-            await self._close()
+            try:
+                async with async_timeout.timeout(10):
+                    logging.debug("Loading watersmart data from %s", self._url)
+                    await self._login()
+                    await self._populate_data()
+            except WatersmartClientAuthenticationError as e:
+                raise e
+            except asyncio.TimeoutError as exception:
+                raise WatersmartClientCommunicationError(
+                    "Timeout error fetching information",
+                ) from exception
+            except (aiohttp.ClientError, socket.gaierror) as exception:
+                raise WatersmartClientCommunicationError(
+                    "Error fetching information",
+                ) from exception
+            except Exception as exception:  # pylint: disable=broad-except
+                raise WatersmartClientError(
+                    "Something really wrong happened!"
+                ) from exception
+            finally:
+                await self._close()
 
         result = []
-
         for datapoint in self._data_series:
             result.append(WatersmartClient._amend_with_local_ts(datapoint))
-
         return result
 
     async def _close(self):
