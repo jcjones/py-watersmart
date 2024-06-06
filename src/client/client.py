@@ -28,7 +28,7 @@ async def main():
     args = PARSER.parse_args()
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(level=args.log_level, format=log_format)
-    wc = WatersmartClient(args.url, args.email, args.password)
+    wc = WatersmartClient(url=args.url, email=args.email, password=args.password)
     try:
         data = await wc.usage()
         for datapoint in sorted(data, key=lambda x: x["read_datetime"]):

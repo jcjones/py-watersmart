@@ -45,4 +45,6 @@ def test_amend_with_local_ts_in_utc():
 @pytest.mark.asyncio
 async def test_disallow_non_watersmart_urls():
     with pytest.raises(AssertionError):
-        WatersmartClient("https://wsmart.example", "e@mail", "passw4rd")
+        WatersmartClient(
+            url="https://wsmart.example", email="e@mail", password="passw4rd"
+        )

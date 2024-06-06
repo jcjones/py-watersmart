@@ -24,7 +24,7 @@ class WatersmartClientAuthenticationError(WatersmartClientError):
 
 
 class WatersmartClient:
-    def __init__(self, url, email, password, session=None):
+    def __init__(self, *, url, email, password, session=None):
         self._url = url
         self._email = email
         self._password = password
