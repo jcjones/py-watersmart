@@ -3,7 +3,7 @@ name = "py-watersmart"
 authors = [
   {name = "J.C. Jones", email = "jc@insufficient.coffee"},
 ]
-version = "0.1.3"
+version = "0.1.5"
 readme = "README.md"
 description = "Obtain water usage data from Watersmart.com"
 classifiers = [
