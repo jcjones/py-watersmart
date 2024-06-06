@@ -24,21 +24,24 @@ class WatersmartClientAuthenticationError(WatersmartClientError):
 
 
 class WatersmartClient:
-    def __init__(self, url, email, password):
+    def __init__(self, url, email, password, session=None):
         self._url = url
         self._email = email
         self._password = password
-        self._headers = {"User-Agent": "py-watersmart " + version("py-watersmart")}
-        self._cache = SQLiteBackend(
-            expire_after=60 * 60 * 6,
-            include_headers=False,
-            cache_name="~/.cache/py-watersmart.db",
-        )
-        self._session = CachedSession(
-            cache=self._cache,
-            headers=self._headers,
-        )
         self._data_series = []
+        if session:
+            self._session = session
+        else:
+            self._headers = {"User-Agent": "py-watersmart " + version("py-watersmart")}
+            self._cache = SQLiteBackend(
+                expire_after=60 * 60 * 6,
+                include_headers=False,
+                cache_name="~/.cache/py-watersmart.db",
+            )
+            self._session = CachedSession(
+                cache=self._cache,
+                headers=self._headers,
+            )
         assert "watersmart.com" in url, "Expected a watersmart.com URL"
         assert "http" in url, "Expected an http/https schema"
         logging.debug("WatersmartClient ready, headers: %s", self._headers)
