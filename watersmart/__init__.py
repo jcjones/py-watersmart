@@ -1,12 +1,10 @@
 """Main WaterSmart module"""
 
 import logging
+import time
 
 from aiohttp_client_cache import CachedSession, SQLiteBackend
-from datetime import datetime
 from importlib.metadata import version
-
-LOCAL_TZ = datetime.now().astimezone().tzinfo
 
 
 class WatersmartClient:
@@ -40,15 +38,12 @@ class WatersmartClient:
         self._data_series = data["data"]["series"]
 
     @classmethod
-    def _amend_with_local_ts(cls, datapoint, tzinfo=LOCAL_TZ):
+    def _amend_with_local_ts(cls, datapoint):
         # The read_datetime is a timestamp in local TZ, not UTC, which
-        # confuses python datetime, because who does that?
-        localized_ts = (
-            datetime.fromtimestamp(datapoint["read_datetime"], tz=None)
-            - tzinfo.utcoffset(None)
-        ).replace(tzinfo=tzinfo)
+        # confuses python datetime, so use the naive struct_time
+        ts = time.gmtime(datapoint["read_datetime"])
         result = datapoint.copy()
-        result["local_datetime"] = localized_ts
+        result["local_datetime"] = time.strftime("%Y-%m-%d %H:%M:%S", ts)
         return result
 
     async def usage(self):
