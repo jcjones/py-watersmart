@@ -1,6 +1,9 @@
 name: release
 
-on: [tag]
+on:
+  push:
+    tags:
+      - v*
 
 jobs:
   pypi-publish:
