@@ -1,9 +1,10 @@
 [project]
 name = "py-watersmart"
-maintainers = [
+authors = [
   {name = "J.C. Jones", email = "jc@insufficient.coffee"},
 ]
 version = "0.1.1"
+readme = "README.md"
 description = "Obtain water usage data from Watersmart.com"
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -27,6 +28,9 @@ test = [
     "pytest-cov",
     "pytest-asyncio",
 ]
+
+[project.scripts]
+watersmart-cli = "client.client:start"
 
 [build-system]
 requires = ["setuptools>=61.0"]

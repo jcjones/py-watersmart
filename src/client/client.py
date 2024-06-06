@@ -27,7 +27,7 @@ async def main():
     data = await wc.usage()
     for datapoint in sorted(data, key=lambda x: x["read_datetime"]):
         parts = [
-            f"{datapoint['local_datetime'].astimezone()}",
+            f"{datapoint['local_datetime']}",
             f"usage: {datapoint['gallons']:8}gal",
             f"leak: {datapoint['leak_gallons']:8}gal",
             f"flags: {datapoint['flags']}",
@@ -35,4 +35,9 @@ async def main():
         print(" | ".join(parts))
 
 
-asyncio.run(main())
+def start():
+    asyncio.run(main())
+
+
+if __name__ == "__main__":
+    start()

@@ -23,16 +23,17 @@ class WatersmartClient:
             headers=self._headers,
         )
         self._data_series = []
-        assert "watersmart.com" in url, "Exepcted a watersmart.com URL"
+        assert "watersmart.com" in url, "Expected a watersmart.com URL"
+        assert "http" in url, "Expected an http/https schema"
         logging.debug("WatersmartClient ready, headers: %s", self._headers)
 
     async def _login(self):
-        url = f"https://{self._url}/index.php/welcome/login?forceEmail=1"
+        url = f"{self._url}/index.php/welcome/login?forceEmail=1"
         login = {"token": "", "email": self._email, "password": self._password}
         await self._session.post(url, data=login)
 
     async def _populate_data(self):
-        url = f"https://{self._url}/index.php/rest/v1/Chart/RealTimeChart"
+        url = f"{self._url}/index.php/rest/v1/Chart/RealTimeChart"
         chart_rsp = await self._session.get(url)
         data = await chart_rsp.json()
         self._data_series = data["data"]["series"]
